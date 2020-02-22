@@ -19,9 +19,9 @@ class User < ApplicationRecord
   #
   # before_create :generate_authentication_token!
 
-
   has_many :products, inverse_of: :user, dependent: :destroy
   has_many :orders, inverse_of: :user, dependent: :destroy
+  has_many :claimed_currencies, inverse_of: :user
   #Ben 6/17/2018 The two methods below are required for omniauth to work
   def self.new_with_session(params, session)
    super.tap do |user|

@@ -10,7 +10,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180619160344) do
+ActiveRecord::Schema.define(version: 20200221021148) do
+
+  create_table "attempted_linkages", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "claimed_currency_id"
+    t.integer "deposit_confirmation_value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["claimed_currency_id"], name: "index_attempted_linkages_on_claimed_currency_id"
+    t.index ["user_id"], name: "index_attempted_linkages_on_user_id"
+  end
+
+  create_table "claimed_currencies", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "currency_id_external_key"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["currency_id_external_key"], name: "index_claimed_currencies_on_currency_id_external_key", unique: true
+    t.index ["user_id"], name: "index_claimed_currencies_on_user_id"
+  end
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer "priority", default: 0, null: false
@@ -71,15 +90,6 @@ ActiveRecord::Schema.define(version: 20180619160344) do
     t.datetime "updated_at", null: false
     t.string "provider"
     t.string "uid"
-    t.string "confirmation_token"
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
-    t.string "unconfirmed_email"
-    t.string "name"
-    t.string "nickname"
-    t.string "image"
-    t.text "tokens"
-    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
