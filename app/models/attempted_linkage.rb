@@ -2,17 +2,26 @@ class AttemptedLinkage < ApplicationRecord
   require 'net/http'
   require 'json'
 
+  include RandomString
+
+  validates :currency_id_external_key, numericality: { only_integer: true, greater_than: 0 }
+
   validate :ensure_currency_exists_and_is_active
   validate :ensure_currency_is_not_claimed
   validate :ensure_user_has_no_active_attempted_linkage_for_currency
+
   belongs_to :user, inverse_of: :attempted_linkages
   belongs_to :claimed_currency, inverse_of: :attempted_linkages
 
   before_create :create_claimed_currency, unless: :claimed_currency_exists?
+  before_create :create_deposit_confirmation_value
 
   private
     def create_claimed_currency
       ClaimedCurrency.create(currency_id_external_key: currency_id)     
+    end
+
+    def create_deposit_confirmation_value
     end
 
     def ensure_currency_exists_and_is_active
@@ -34,10 +43,11 @@ class AttemptedLinkage < ApplicationRecord
     def ensure_currency_is_not_claimed
       currency_id = self.currency_id_external_key.to_s
 
-      claimed_currencies = ClaimedCurrency.where(currency_id_external_key: currency_id)
+      # claimed_currency records where the currency_id_external_key field matches and the user_id column is set
+      claimed_currencies_with_user_linked = ClaimedCurrency.where(currency_id_external_key: currency_id).where.not(user_id: [nil, ""]) 
 
-      if claimed_currencies.count > 0
-        errors.add(:currency, "currency is already claimed so you cannot create an attempted linkage for it. To still claim it, please create an attempted reallocation to change the claimant from the current user to you")
+      if claimed_currencies_with_user_linked.count > 0
+        errors.add(:currency, "currency is already claimed so you cannot create an attempted linkage for it. To still claim it, please create an attempted reallocation to change the claimant from the user account that currently has a claim on the currency to your user account")
       else
         true
       end
@@ -51,9 +61,9 @@ class AttemptedLinkage < ApplicationRecord
       if claimed_currencies.count > 0
         attempted_linkages = claimed_currencies.first.attempted_linkages
 
-        users_attempted_linkages = attempted_linkages.where(user_id: self.user_id, active: true)
+        active_attempted_linkages_by_user = attempted_linkages.where(user_id: self.user_id, active: true)
 
-        if users_attempted_linkages > 0
+        if active_attempted_linkages_by_user > 0
           errors.add(:user, "already has an active attempted linkage to the specified currency")
         else
           true
