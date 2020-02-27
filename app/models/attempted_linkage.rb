@@ -2,7 +2,7 @@ class AttemptedLinkage < ApplicationRecord
   require 'net/http'
   require 'json'
 
-  include RandomString
+  include RandomValue
 
   validates :currency_id_external_key, numericality: { only_integer: true, greater_than: 0 }
 
@@ -22,6 +22,8 @@ class AttemptedLinkage < ApplicationRecord
     end
 
     def create_deposit_confirmation_value
+      required_deposit_value = generate_random_value # the generate_random_value method is in the RandomValue module and generates a value between 1000 and 9999
+      self.deposit_confirmation_value = required_deposit_value 
     end
 
     def ensure_currency_exists_and_is_active

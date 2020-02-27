@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200226090500) do
+ActiveRecord::Schema.define(version: 20200227033420) do
 
   create_table "attempted_linkages", force: :cascade do |t|
     t.integer "user_id"
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 20200226090500) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "currency_id_external_key"
-    t.boolean "active"
+    t.boolean "active", default: true
     t.index ["claimed_currency_id"], name: "index_attempted_linkages_on_claimed_currency_id"
     t.index ["user_id"], name: "index_attempted_linkages_on_user_id"
   end
@@ -92,6 +92,15 @@ ActiveRecord::Schema.define(version: 20200226090500) do
     t.datetime "updated_at", null: false
     t.string "provider"
     t.string "uid"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.string "name"
+    t.string "nickname"
+    t.string "image"
+    t.text "tokens"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
