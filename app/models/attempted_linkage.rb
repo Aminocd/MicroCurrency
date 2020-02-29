@@ -4,6 +4,9 @@ class AttemptedLinkage < ApplicationRecord
 
   include RandomValue
 
+  before_validation :create_claimed_currency, unless: :claimed_currency_exists?
+  before_validation :assign_claimed_currency, if: :claimed_currency_exists?
+
   validates :currency_id_external_key, numericality: { only_integer: true, greater_than: 0 }
 
   validate :ensure_currency_exists_and_is_active
@@ -13,16 +16,21 @@ class AttemptedLinkage < ApplicationRecord
   belongs_to :user, inverse_of: :attempted_linkages
   belongs_to :claimed_currency, inverse_of: :attempted_linkages
 
-  before_create :create_claimed_currency, unless: :claimed_currency_exists?
   before_create :create_deposit_confirmation_value
 
   private
     def create_claimed_currency
-      ClaimedCurrency.create(currency_id_external_key: currency_id)     
+      claimed_currency = ClaimedCurrency.create(currency_id_external_key: self.currency_id_external_key)     
+      self.claimed_currency_id = claimed_currency.id
+    end
+
+    def assign_claimed_currency
+      claimed_currency = ClaimedCurrency.where(currency_id_external_key: self.currency_id_external_key).first
+      self.claimed_currency_id = claimed_currency.id
     end
 
     def create_deposit_confirmation_value
-      required_deposit_value = generate_random_value # the generate_random_value method is in the RandomValue module and generates a value between 1000 and 9999
+      required_deposit_value = generate_random_value # the generate_random_value method is in the RandomValue module and generates a value between 1000 and 9999, inclusive
       self.deposit_confirmation_value = required_deposit_value 
     end
 
@@ -65,7 +73,7 @@ class AttemptedLinkage < ApplicationRecord
 
         active_attempted_linkages_by_user = attempted_linkages.where(user_id: self.user_id, active: true)
 
-        if active_attempted_linkages_by_user > 0
+        if active_attempted_linkages_by_user.count > 0
           errors.add(:user, "already has an active attempted linkage to the specified currency")
         else
           true
