@@ -31,7 +31,8 @@ MarketPlaceApi::Application.routes.draw do
   			resources :orders, :only => [:index, :show, :create]
   		end
 		  resources :products, :only => [:show, :index]
-      resources :attempted_linkages, :only => [:create]
+      resources :attempted_linkages, :only => [:show, :index, :create]
+      resources :claimed_currencies, :only => [:show]
     end
   end
 end
