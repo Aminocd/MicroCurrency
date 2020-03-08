@@ -16,10 +16,20 @@ class ClaimedCurrency < ApplicationRecord
 
     ## retrieve the private currency holding of the MicroCurrency_Deposit account that holds the specified currency
     # create URI object
-    uri = URI("https://api.mycurrency.com/authorized_currencies/#{self.currency_id_external_key}")
+    uri = URI("https://api.mycurrency.com/authorized_currencies/#{self.currency_id_external_key.to_s}")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+    http.start
+    request = Net::HTTP::Get.new(uri.request_uri, get_headers_hash)
+    response = http.request(request)
 
-    response = Net::HTTP.get(uri, get_headers_hash) 
-    if response.code == 200
+#    Rails.logger.info "the response code is #{response.code}"
+#    Rails.logger.info "the response is #{response.inspect}"
+#    Rails.logger.info "the response body is #{response.body}"
+    
+    if response.code.to_i == 200
+#      Rails.logger.info "\n\ncode is 200\n\n"
       json_str = JSON.parse(response.body)
       private_currency_holding_id = json_str["data"]["attributes"]["private-currency-holding-id"]
 
@@ -30,9 +40,27 @@ class ClaimedCurrency < ApplicationRecord
       # get the created_at unit time of the attempted_linkage
       start_time = last_attempted_linkage.created_at.to_i 
 
-      response = Net::HTTP.get_response(URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/authorized_private_currency_holdings/#{private_currencyHolding_id}/pr_h_authentication_transaction?amount=#{amount}&start_time=#{start_time}"))
+      uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/authorized_private_currency_holdings/#{private_currency_holding_id}/pr_h_authentication_transaction?amount=#{amount}&start_time=#{start_time}")
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.start
+      request = Net::HTTP::Get.new(uri.request_uri, get_headers_hash)
+      response = http.request(request)
+      json_str = JSON.parse(response.body)
+      transaction_authentication_status = json_str["data"]["attributes"]["transaction-authentication-status"]
 
-      puts response.body
+      if transaction_authentication_status
+        if self.user.nil?
+          self.update_column(:user_id, user_id)
+          attempted_linkages = self.attempted_linkages.where(user_id: user_id, active: true).update_all(active: false)
+        end
+      end
+#      Rails.logger.info "the second response code is #{response.code}"
+#      Rails.logger.info "the second response is #{response.inspect}"
+#      Rails.logger.info "the second response body is #{response.body}"
+#   else
+#      Rails.logger.info "\n\ncode is not 200\n\n"
     end
   end
 

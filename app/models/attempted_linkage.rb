@@ -18,6 +18,13 @@ class AttemptedLinkage < ApplicationRecord
 
   before_create :create_deposit_confirmation_value
 
+  def self.deactivate_attempted_linkages_above_age_threshold
+    cutoff = Time.now - 15.minutes # the cutoff time is 15 minutes before program runtime 
+    wrong_cutoff = Time.now - 1.year # use a far back cutoff or testing purposes
+    cutoff = wrong_cutoff # will comment out after testing
+    AttemptedLinkage.where(active: true).where("created_at < ?", cutoff).update_all(active: false) # deactivate all attempted linkages older than 15 minutes ago and that are true
+  end
+
   private
     def create_claimed_currency
       claimed_currency = ClaimedCurrency.create(currency_id_external_key: self.currency_id_external_key)     

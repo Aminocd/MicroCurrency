@@ -7,7 +7,7 @@ class Api::V1::ClaimedCurrenciesController < APIController
     if current_user.active
       claimed_currency = ClaimedCurrency.find(params[:id])
 
-      if claimed_currency.nil?
+      if claimed_currency.user.nil?
         claimed_currency.check_transactions_for_confirmation_value(current_user.id)
       end
 
@@ -21,7 +21,7 @@ class Api::V1::ClaimedCurrenciesController < APIController
 
   def index
     if current_user.active
-       
+      render json: current_user.claimed_currencies
     else
       render json: { errors: "can't view claimed currencies as logged in user is inactive"}, status: 403
     end
