@@ -13,7 +13,7 @@ class Api::V1::ClaimedCurrenciesController < APIController
 
       currency_attributes = claimed_currency.get_currency_attributes
 
-      render json: claimed_currency, currency_name: currency_attributes["name"], currency_icon_url: currency_attributes["get-icon-url"]
+      render json: claimed_currency, currency_name: currency_attributes["name"], currency_icon_url: currency_attributes["get-icon-url"], logged_in_user_id: current_user.id
     else
       render json: { errors: "can't view claimed currency as logged in user is inactive"}, status: 403
     end

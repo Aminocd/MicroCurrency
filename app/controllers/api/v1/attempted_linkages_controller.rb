@@ -11,7 +11,14 @@ class Api::V1::AttemptedLinkagesController < APIController
 
   def index
     if current_user.active == true
-      attempted_linkages = current_user.attempted_linkages.where(active: true).reverse
+      # all active attempted_linkages of the user
+      if params[:claimed_currency_id].nil?
+        attempted_linkages = current_user.attempted_linkages.where(active: true).reverse
+      else
+      # all active attempted_linkages of the user for the claimed_currency specified by the claimed_currency_id param
+        claimed_currency = ClaimedCurrency.find(params[:claimed_currency_id])
+        attempted_linkages = current_user.attempted_linkages.where(claimed_currency: claimed_currency.id).where(active: true).reverse
+      end
 
       paginated_attempted_linkages = Kaminari.paginate_array(attempted_linkages).page(params[:page]).per(params[:per_page])
 

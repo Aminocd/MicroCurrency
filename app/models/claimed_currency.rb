@@ -28,7 +28,7 @@ class ClaimedCurrency < ApplicationRecord
 #    Rails.logger.info "the response is #{response.inspect}"
 #    Rails.logger.info "the response body is #{response.body}"
     
-    if response.code.to_i == 200
+    if (response.code.to_i == 200 && (last_attempted_linkage != nil))
 #      Rails.logger.info "\n\ncode is 200\n\n"
       json_str = JSON.parse(response.body)
       private_currency_holding_id = json_str["data"]["attributes"]["private-currency-holding-id"]
@@ -92,13 +92,28 @@ class ClaimedCurrency < ApplicationRecord
       uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
 
       # populate params variable that will be posted to the MyCurrency Create Store API endpoint
-      params = {"product": {'sub_category_id': "#{A.currency_product_category_id}", 'name':"Credit for #{currency_name}", 'description': "used by MicroCurrency companion app for internal operations to issue MyCurrency vouchers", "active": "true", "price_cents": "100"}}
+      params = {"product": {'sub_category_id': "#{A.currency_product_category_id}", 'product_name':"Credit for #{currency_name}", 'product_description': "used by MicroCurrency companion app for internal operations to issue MyCurrency vouchers", "active": "true", "price_cents": "100"}}
       
       # create new HTTP object
       http = Net::HTTP.new(uri.host, uri.port)
 
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       # post the variables and headers to create product and get back the response.
-      http.post(uri.path, params.to_json, get_headers_hash)
+      response = http.post(uri.path, params.to_json, get_headers_hash)      
+      # for testing
+      Rails.logger.info "\n\nProduct create Inspect #{response.inspect}\n\n"
+      Rails.logger.info "\n\nProduct create The body: #{response.body}\n\n"
+      Rails.logger.info "\n\nProduct create The code: #{response.code}\n\n"
+      json_response = JSON.parse(response.body)
+      product_id = json_response["data"]["id"]
+
+      if response.code.to_i != 201
+	      throw :abort
+        false
+      else
+        self.product_id_external_key = product_id
+      end
     end
     
     def get_headers_hash

@@ -3,6 +3,7 @@ class Api::V1::ClaimedCurrencySerializer < ActiveModel::Serializer
 
   attribute :currency_name ## method
   attribute :currency_icon_url ## method
+  attribute :status_of_claimed_currency ## method
 
   def currency_name
     unless @instance_options.nil?
@@ -17,6 +18,16 @@ class Api::V1::ClaimedCurrencySerializer < ActiveModel::Serializer
       @instance_options[:currency_icon_url]
     else
       nil
+    end
+  end
+
+  def status_of_claimed_currency
+    if object.user.nil?
+      "unclaimed"
+    elsif object.user.id == @instance_options[:logged_in_user_id]
+      "claimed_by_you"
+    else
+      "claimed_by_another_user"
     end
   end
 end

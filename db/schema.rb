@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200302081428) do
+ActiveRecord::Schema.define(version: 20200309133507) do
 
   create_table "attempted_linkages", force: :cascade do |t|
     t.integer "user_id"
@@ -29,6 +29,7 @@ ActiveRecord::Schema.define(version: 20200302081428) do
     t.integer "currency_id_external_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "product_id_external_key"
     t.index ["currency_id_external_key"], name: "index_claimed_currencies_on_currency_id_external_key", unique: true
     t.index ["user_id"], name: "index_claimed_currencies_on_user_id"
   end
