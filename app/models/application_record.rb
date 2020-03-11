@@ -1,5 +1,12 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
+  def self.show_all(collection_proxy)
+    collection_proxy.find_each do |r|
+      puts "\n"
+      puts r.inspect
+      puts
+    end
+  end
 
   def self.microcurrency_deposit_user_id
     MICROCURRENCY_DEPOSIT_USER_ID
