@@ -37,5 +37,5 @@ class ApplicationRecord < ActiveRecord::Base
 
     CURRENCY_PRODUCT_CATEGORY_ID = 83
 
-    CUTOFF_MINUTES = 3
+    CUTOFF_MINUTES = 15
 end
