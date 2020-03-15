@@ -21,7 +21,7 @@ class Api::V1::ClaimedCurrenciesController < APIController
 
   def index
     if current_user.active
-      render json: current_user.claimed_currencies
+      render json: current_user.claimed_currencies, logged_in_user_id: current_user.id
     else
       render json: { errors: "can't view claimed currencies as logged in user is inactive"}, status: 403
     end

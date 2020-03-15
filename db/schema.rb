@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20200309133507) do
+ActiveRecord::Schema.define(version: 20200315081837) do
 
   create_table "attempted_linkages", force: :cascade do |t|
     t.integer "user_id"
@@ -30,6 +30,9 @@ ActiveRecord::Schema.define(version: 20200309133507) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "product_id_external_key"
+    t.integer "private_currency_holding_id_external_key"
+    t.string "currency_name"
+    t.string "currency_icon_url"
     t.index ["currency_id_external_key"], name: "index_claimed_currencies_on_currency_id_external_key", unique: true
     t.index ["user_id"], name: "index_claimed_currencies_on_user_id"
   end
@@ -93,17 +96,8 @@ ActiveRecord::Schema.define(version: 20200309133507) do
     t.datetime "updated_at", null: false
     t.string "provider"
     t.string "uid"
-    t.string "confirmation_token"
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
-    t.string "unconfirmed_email"
-    t.string "name"
-    t.string "nickname"
-    t.string "image"
-    t.text "tokens"
     t.string "username"
     t.boolean "active", default: false
-    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true

@@ -54,8 +54,9 @@ class ClaimedCurrency < ApplicationRecord
 
         if transaction_authentication_status
           if self.user.nil?
-            self.update_column(:user_id, user_id)
-            attempted_linkages = self.attempted_linkages.where(user_id: user_id, active: true).update_all(active: false)
+            self.update_column(:user_id, user_id) # link user who verified ownership with transaction to claimed currency
+            self.update_column(:private_currency_holding_id_external_key, private_currency_holding_id) # link user who verified ownership with transaction to claimed currency
+            attempted_linkages = self.attempted_linkages.where(claimed_currency_id: self.id, user_id: user_id, active: true).update_all(active: false) # make attempted linkages for that claimed currency inactive
           end
         end
   #      Rails.logger.info "the second response code is #{response.code}"

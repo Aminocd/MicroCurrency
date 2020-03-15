@@ -24,6 +24,10 @@ class ApplicationRecord < ActiveRecord::Base
     CURRENCY_PRODUCT_CATEGORY_ID
   end
 
+  def self.cutoff_minutes
+    CUTOFF_MINUTES
+  end
+
   private
     MICROCURRENCY_DEPOSIT_USER_ID = 165
 
@@ -32,4 +36,6 @@ class ApplicationRecord < ActiveRecord::Base
     MICROCURRENCY_STORE_ID = 60
 
     CURRENCY_PRODUCT_CATEGORY_ID = 83
+
+    CUTOFF_MINUTES = 3
 end

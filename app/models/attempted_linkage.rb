@@ -19,15 +19,16 @@ class AttemptedLinkage < ApplicationRecord
   before_create :create_deposit_confirmation_value
 
   def self.deactivate_attempted_linkages_above_age_threshold
-    cutoff = Time.now - 15.minutes # the cutoff time is 15 minutes before program runtime 
-    wrong_cutoff = Time.now - 1.year # use a far back cutoff or testing purposes TODO: remove old date assignment on this line and the one below it
-    cutoff = wrong_cutoff # will comment out after testing
+    cutoff = Time.now - A.cutoff_minutes.minutes # the cutoff time is 15 minutes before program runtime 
+    #wrong_cutoff = Time.now - 1.year # use a far back cutoff or testing purposes TODO: remove old date assignment on this line and the one below it
+    #cutoff = wrong_cutoff # will comment out after testing
     AttemptedLinkage.where(active: true).where("created_at < ?", cutoff).update_all(active: false) # deactivate all attempted linkages older than 15 minutes ago and that are true
   end
 
   private
     def create_claimed_currency
-      claimed_currency = ClaimedCurrency.create(currency_id_external_key: self.currency_id_external_key)     
+      currency_attributes = get_currency_attributes(self.currency_id_external_key.to_s)
+      claimed_currency = ClaimedCurrency.create(currency_id_external_key: self.currency_id_external_key, currency_name: currency_attributes["name"], currency_icon_url: "https://api.microcurrency.com#{currency_attributes["get-icon-url"]}")     
       self.claimed_currency_id = claimed_currency.id
     end
 
@@ -100,5 +101,12 @@ class AttemptedLinkage < ApplicationRecord
       else
         false
       end
+    end
+    
+    def get_currency_attributes(currency_id)
+      response = Net::HTTP.get_response(URI('https://api.mycurrency.com/currencies/' + currency_id))
+      response_json = JSON.parse(response.body)
+      response_json["data"]["attributes"]
+
     end
 end
