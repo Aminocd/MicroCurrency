@@ -10,7 +10,7 @@ class Api::V1::ClaimedCurrenciesController < APIController
       if claimed_currency.user.nil?
         claimed_currency.check_transactions_for_confirmation_value(current_user.id)
       else
-        claimed_currency.check_currency_for_matching_public_email
+        claimed_currency.check_currency_for_matching_public_email(current_user.id)
       end
 
       currency_attributes = claimed_currency.get_currency_attributes

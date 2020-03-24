@@ -28,6 +28,10 @@ class ApplicationRecord < ActiveRecord::Base
     CUTOFF_MINUTES
   end
 
+  def self.string_after_at
+    STRING_AFTER_AT
+  end
+
   private
     MICROCURRENCY_DEPOSIT_USER_ID = 165
 
@@ -38,4 +42,6 @@ class ApplicationRecord < ActiveRecord::Base
     CURRENCY_PRODUCT_CATEGORY_ID = 83
 
     CUTOFF_MINUTES = 15
+
+    STRING_AFTER_AT = "microcurrency.com"
 end
