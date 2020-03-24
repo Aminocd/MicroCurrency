@@ -4,6 +4,7 @@ class ClaimedCurrency < ApplicationRecord
 
   belongs_to :user, inverse_of: :claimed_currencies, optional: true
   has_many :attempted_linkages, inverse_of: :claimed_currency
+  has_many :attempted_reallocations, inverse_of: :claimed_currency
 
   before_create :create_product_on_mycurrency
 
@@ -68,6 +69,11 @@ class ClaimedCurrency < ApplicationRecord
     end
   end
 
+  def check_currency_for_matching_public_email
+    # get attempted_reallocations linked to claimed_currency which were created by the user and are active
+    attempted_reallocations = self.attempted_reallocations.where(user_id: user_id, active: true) 
+  end
+
   def get_currency_attributes
     response = Net::HTTP.get_response(URI('https://api.mycurrency.com/currencies/' + self.currency_id_external_key.to_s))
     if response.code.to_i == 200
@@ -110,7 +116,10 @@ class ClaimedCurrency < ApplicationRecord
       Rails.logger.info "\n\nProduct create The body: #{response.body}\n\n"
       Rails.logger.info "\n\nProduct create The code: #{response.code}\n\n"
       json_response = JSON.parse(response.body)
-      product_id = json_response["data"]["id"]
+      
+      unless json_response["data"].nil?
+        product_id = json_response["data"]["id"]
+      end
 
       if response.code.to_i != 201
 	      throw :abort

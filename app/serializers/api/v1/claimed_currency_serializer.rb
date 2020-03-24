@@ -1,5 +1,5 @@
 class Api::V1::ClaimedCurrencySerializer < ActiveModel::Serializer
-  attributes :id, :user_id, :created_at, :updated_at, :currency_id_external_key, :product_id_external_key, :currency_name, :currency_icon_url
+  attributes :id, :user_id, :created_at, :updated_at, :currency_id_external_key, :product_id_external_key, :currency_name, :currency_icon_url, :user_id_external_key
 
   attribute :status_of_claimed_currency ## method
 
