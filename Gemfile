@@ -57,6 +57,7 @@ group :test do
 	gem "rspec-rails", "~> 3.7", require: false
 	gem "email_spec"
 	gem 'shoulda-matchers'
+  gem "fakeweb", "~> 1.3", git: 'https://github.com/chrisk/fakeweb'
 end
 
 group :development, :test do

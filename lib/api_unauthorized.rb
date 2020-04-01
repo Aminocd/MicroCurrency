@@ -1,7 +1,9 @@
 #Ben 6/17/2018 Allows devise to send unauthorized messages as json see devise.rb initializer to see how it is set up
 class ApiUnauthorized < Devise::FailureApp
   def respond
-    if request.format == :json
+    puts "request accept in lib/api_unauthorized.rb: #{request.headers['Accept']}"
+    if request.headers['Accept'].include
+#    if request.format == :json
       json_error_response
     else
       super

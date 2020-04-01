@@ -15,9 +15,15 @@ class ClaimedCurrency < ApplicationRecord
     # only look at the last attempted_linkage in case the validation preventing multiple active attempted_linkages from a specific user for a claimed_currency being created somehow failed and multiple attempted_linkages exist that have these properties
     last_attempted_linkage = attempted_linkages.last
 
-    ## retrieve the private currency holding of the MicroCurrency_Deposit account that holds the specified currency
+    ## retrieve the particular private currency holding of the MicroCurrency_Deposit account that holds the specified currency
     # create URI object
-    uri = URI("https://api.mycurrency.com/authorized_currencies/#{self.currency_id_external_key.to_s}")
+    # if test environment, add 'state=post' key value pair so that rspec can return different, post-transaction verification, results 
+    if Rails.env.test?
+      uri = URI("https://api.mycurrency.com/authorized_currencies/#{self.currency_id_external_key.to_s}?state=post")
+    else
+      uri = URI("https://api.mycurrency.com/authorized_currencies/#{self.currency_id_external_key.to_s}")
+    end
+
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_NONE
@@ -149,7 +155,13 @@ class ClaimedCurrency < ApplicationRecord
       currency_id = self.currency_id_external_key.to_s
 
       # first return the currency details from MyCurrency
-      response = Net::HTTP.get_response(URI('https://api.mycurrency.com/currencies/' + currency_id))
+      uri = URI("https://api.mycurrency.com/currencies/" + currency_id)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.start
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
       
       # turn response into json
       json_response = JSON.parse(response.body)
@@ -158,7 +170,13 @@ class ClaimedCurrency < ApplicationRecord
       currency_name = json_response["data"]["attributes"]["name"] 
 
       # turn create product API endpoint URL into a URI object
-      uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
+      # if test environment, add 'currency_id_external_key=<ID>' key value pair so that rspec can return different, post-transaction verification, results 
+      if Rails.env.test?
+        currency_id = json_response["data"]["id"]
+        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products?currency_id_external_key=#{currency_id}")
+      else
+        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
+      end
 
       # populate params variable that will be posted to the MyCurrency Create Store API endpoint
       params = {"product": {'sub_category_id': "#{A.currency_product_category_id}", 'product_name':"Credit for #{currency_name}", 'product_description': "used by MicroCurrency companion app for internal operations to issue MyCurrency vouchers", "active": "true", "price_cents": "100"}}

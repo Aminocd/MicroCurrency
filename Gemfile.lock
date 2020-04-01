@@ -1,4 +1,10 @@
 GIT
+  remote: https://github.com/chrisk/fakeweb
+  revision: 2b08c1ff2714ec13a12f3497d67fcefce95c2cbe
+  specs:
+    fakeweb (1.3.0)
+
+GIT
   remote: https://github.com/oauth-xx/oauth2.git
   revision: 8f422e11ee4221b4436d43b512fb203c74d5ebf8
   specs:
@@ -220,7 +226,7 @@ GEM
       method_source
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
-    rake (12.3.1)
+    rake (13.0.1)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
@@ -311,6 +317,7 @@ DEPENDENCIES
   dotenv-rails
   email_spec
   factory_bot_rails
+  fakeweb (~> 1.3)!
   ffaker
   font-awesome-rails
   kaminari

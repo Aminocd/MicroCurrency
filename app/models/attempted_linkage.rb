@@ -104,9 +104,14 @@ class AttemptedLinkage < ApplicationRecord
     end
     
     def get_currency_attributes(currency_id)
-      response = Net::HTTP.get_response(URI('https://api.mycurrency.com/currencies/' + currency_id))
+      uri = URI("https://api.mycurrency.com/currencies/" + currency_id)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      http.start
+      request = Net::HTTP::Get.new(uri.request_uri)
+      response = http.request(request)
       response_json = JSON.parse(response.body)
       response_json["data"]["attributes"]
-
     end
 end

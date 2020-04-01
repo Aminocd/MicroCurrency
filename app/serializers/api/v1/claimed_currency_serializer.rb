@@ -7,7 +7,7 @@ class Api::V1::ClaimedCurrencySerializer < ActiveModel::Serializer
     if object.user.nil?
       "unclaimed"
     elsif object.user.id == @instance_options[:logged_in_user_id]
-      "claimed_by_you"
+      "claimed_by_logged_in_user"
     else
       "claimed_by_another_user"
     end
