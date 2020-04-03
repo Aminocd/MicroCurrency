@@ -58,6 +58,8 @@ group :test do
 	gem "email_spec"
 	gem 'shoulda-matchers'
   gem "fakeweb", "~> 1.3", git: 'https://github.com/chrisk/fakeweb'
+  gem 'database_cleaner-active_record'
+  gem 'webmock'
 end
 
 group :development, :test do

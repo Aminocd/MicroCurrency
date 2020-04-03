@@ -11,11 +11,8 @@ class ApplicationController < ActionController::Base
   include Authenticable 
   #Ben 6/17/2018 Moved the pagination helper into the APIController
 
-  protected
-
-  def configure_permitted_parameters
-    # Permit the `subscribe_newsletter` parameter along with the other
-    # sign up parameters.
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:username])
-  end
+  private
+    def record_not_found_exception(exception)
+      render json: { errors: "#{exception.message}" }, status: 422
+    end
 end

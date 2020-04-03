@@ -31,7 +31,6 @@ describe Api::V1::AttemptedLinkagesController, type: :controller do
       end
 
       it "returns error message" do
-        puts "\n\n\nattempted_linkage_response: #{json_response.inspect}\n\n\n"
         attempted_linkage_response = json_response
         expect(attempted_linkage_response[:errors][0][:detail]).to include "You need to sign in"
       end

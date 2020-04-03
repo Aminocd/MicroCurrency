@@ -170,17 +170,30 @@ class ClaimedCurrency < ApplicationRecord
       currency_name = json_response["data"]["attributes"]["name"] 
 
       # turn create product API endpoint URL into a URI object
+# changing from FakeWeb to WebMock for Rspec HTTP testing, so no longer need the conditional addition of an currency_id_external_key paramater
       # if test environment, add 'currency_id_external_key=<ID>' key value pair so that rspec can return different, post-transaction verification, results 
-      if Rails.env.test?
-        currency_id = json_response["data"]["id"]
-        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products?currency_id_external_key=#{currency_id}")
-      else
-        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
-      end
+#      if Rails.env.test?
+#        currency_id = json_response["data"]["id"]
+#        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products?currency_id_external_key=#{currency_id}")
+#        Rails.logger.info uri
+#      else
+#        uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
+#      end
+      uri = URI("https://api.mycurrency.com/users/#{A.microcurrency_deposit_user_id}/issuer/currencies/#{A.microcurrency_credit_currency_id}/stores/#{A.microcurrency_store_id}/products")
 
       # populate params variable that will be posted to the MyCurrency Create Store API endpoint
       params = {"product": {'sub_category_id': "#{A.currency_product_category_id}", 'product_name':"Credit for #{currency_name}", 'product_description': "used by MicroCurrency companion app for internal operations to issue MyCurrency vouchers", "active": "true", "price_cents": "100"}}
       
+      Rails.logger.info uri
+      Rails.logger.info params
+    
+      if ClaimedCurrency.all.nil?
+        Rails.logger.info "\nThe ClaimedCurrency table is empty\n"
+      elsif ClaimedCurrency.all.count > 0
+        Rails.logger.info "\nThe ClaimedCurrency table is not empty\n"
+      else
+        Rails.logger.info "the count is #{ClaimedCurrency.all.count}"
+      end
       # create new HTTP object
       http = Net::HTTP.new(uri.host, uri.port)
 
