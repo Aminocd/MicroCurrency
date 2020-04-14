@@ -20,8 +20,6 @@ describe User do
 	it { should allow_value('example@domain.com').for(:email)}
 # it { should validate_uniqueness_of(:auth_token)} #Ben Dont need this anymore
 
-	it { should have_many(:products) }
-	it { should have_many(:orders)}
 	it { should have_many(:whitelisted_jwts)}
 
 	# describe "#generates_authentication_token!" do
@@ -43,18 +41,4 @@ describe User do
 		it {should_not be_valid}
 	end
 
-	describe "#products associaton" do
-		before do
-			@user.save
-			3.times { FactoryBot.create :product, user: @user }
-		end
-
-		it "destroys the associated products on self destruct" do
-			@products = @user.products
-			@user.destroy
-			@products.each do |product|
-				expect(Product.find(product)).to raise_error ActiveRecord::RecordNotFound
-			end
-		end
-	end
 end
