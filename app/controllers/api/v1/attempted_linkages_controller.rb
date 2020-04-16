@@ -38,7 +38,7 @@ class Api::V1::AttemptedLinkagesController < APIController
         render json: { errors: attempted_linkage.errors}, status: 422
       end
     else
-      render json: { errors: "logged in user is inactive"}, status: 422
+      render json: { errors: "logged in user is inactive" }, status: 422
     end
   end
 

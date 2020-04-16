@@ -62,7 +62,7 @@ class AttemptedLinkage < ApplicationRecord
       currency_id = self.currency_id_external_key.to_s
 
       # claimed_currency records where the currency_id_external_key field matches and the user_id column is set
-      claimed_currencies_with_user_linked = ClaimedCurrency.where(currency_id_external_key: currency_id).where.not(user_id: [nil, ""]) 
+      claimed_currencies_with_user_linked = ClaimedCurrency.where(currency_id_external_key: currency_id).where.not(user_id: nil) 
 
       if claimed_currencies_with_user_linked.count > 0
         errors.add(:currency, "currency is already claimed so you cannot create an attempted linkage for it. To still claim it, please create an attempted reallocation to change the claimant from the user account that currently has a claim on the currency to your user account")
