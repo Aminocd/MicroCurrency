@@ -1,5 +1,7 @@
-require 'rails_helper'
+require 'spec_helper'
 
-RSpec.describe Api::V1::AttemptedReallocationsController, type: :controller do
+describe Api::V1::AttemptedReallocationsController, type: :controller do
 
+  describe "GET #show" do
+  end
 end
